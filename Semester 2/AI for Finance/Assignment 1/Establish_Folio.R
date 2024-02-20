@@ -5,9 +5,8 @@ myStocks <- c("AAPL", "JPM", "PFE", "AMZN", "XOM", "SO", "GE", "BHP", "PLD","VZ"
 Data <- new.env()
 
 # Adjusting the date to a range for which data is available
-#endDate <- format(Sys.Date(), "%Y-%m-%d")  # Current date in YYYY-MM-DD format
-
-getSymbols(myStocks, src = "yahoo", from = "2019-01-01", to = "2020-01-01", env = Data)
+endDate <- format(Sys.Date(), "%Y-%m-%d")  # Current date in YYYY-MM-DD format
+getSymbols(myStocks, src = "yahoo", from = "2019-01-01", env = Data)
 
 
 ## Note: Once you have downloaded the data then try to avoid downloading it again in the same session (unless you have lost or corrupted it).
