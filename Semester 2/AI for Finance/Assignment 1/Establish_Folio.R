@@ -1,28 +1,25 @@
-#install.packages("quantmod")
+# Install and load required packages
+install.packages("quantmod")
+install.packages("GA")
 
+library(GA)
 library(quantmod)
-myStocks <- c("AAPL", "JPM", "PFE", "AMZN", "XOM", "SO", "GE", "BHP", "PLD","VZ")
-Data <- new.env()
 
-# Adjusting the date to a range for which data is available
+# Get stock data
+myStocks <- c("AAPL", "JPM", "PFE", "AMZN", "XOM", "SO", "GE", "BHP", "PLD", "VZ")
+Data <- new.env()
 endDate <- format(Sys.Date(), "%Y-%m-%d")  # Current date in YYYY-MM-DD format
 getSymbols(myStocks, src = "yahoo", from = "2019-01-01", env = Data)
 
-
-## Note: Once you have downloaded the data then try to avoid downloading it again in the same session (unless you have lost or corrupted it).
-## Hitting Yahoo finance too frequently can occasionally result in requests getting blocked.
-
-
-Returns <- lapply(ls(Data), function(sym) 
-{
+# Calculate returns
+Returns <- lapply(ls(Data), function(sym) {
     stockData <- get(sym, envir = Data)
-    # Calculating rate of change, ensuring no NA values are returned
     ROC(Ad(stockData), type = "discrete", na.pad = FALSE)
 })
 
 Returns <- Returns[sapply(Returns, function(x) !is.null(dim(x)))]
 
-# Merging data frames safely
+# Merge data frames
 if(length(Returns) > 0){
   ReturnsDF <- do.call(merge, Returns)
   covariance <- cov(na.omit(ReturnsDF))  # Compute covariance, omitting NA values
@@ -31,50 +28,40 @@ if(length(Returns) > 0){
   covariance <- matrix()
 }
 
-#print(covariance)
-
-weights <- c(0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10)
-
-# Weighted Returns
-weightedReturns <- ReturnsDF %*% weights
-
-# Portfolio Variance
-portfolioVariance <- t(weights) %*% cov(ReturnsDF) %*% weights
-
-fitnessfunction <- function(ReturnsDF, weights) {
-    weightedReturns <- ReturnsDF %*% weights
-    variance <- t(weights) %*% cov(ReturnsDF, use = "complete.obs") %*% weights
-    list(weightedReturns = weightedReturns, variance = variance)
-}
-
-#============================================
-
-
-#Identify the optimal set of weights for your portfolio which gives the best balance of risk versus return:
-
-# Objective function: Minimize portfolio variance
-optimizeVariance <- function(weights, returns) {
-  # Ensure weights sum to 1
-  weights <- weights / sum(weights)
-  
+# Fitness function for GA
+fitness_function <- function(weights) {
   # Calculate portfolio variance
-  variance <- t(weights) %*% cov(returns) %*% weights
-  return(variance)
+  portfolio_variance <- t(weights) %*% covariance %*% weights
+
+  # Extract the variance value from the matrix
+  variance_value <- as.numeric(portfolio_variance)
+
+  # Penalty for not summing to 1
+  penalty = 1000 * abs(sum(weights) - 1)
+
+  # Minimize the variance plus penalty
+  return(variance_value + penalty)
 }
 
-# Initial weights (equal distribution)
-initialWeights <- rep(1/ncol(ReturnsDF), ncol(ReturnsDF))
+# GA settings
+ga_settings <- list(type = "real-valued", 
+                    fitness = fitness_function, 
+                    lower = rep(0, 10), 
+                    upper = rep(1, 10), 
+                    popSize = 50, 
+                    maxiter = 100, 
+                    run = 50)
 
-# Use optim() to minimize the variance
-optimalWeights <- optim(
-  par = initialWeights,
-  fn = optimizeVariance, 
-  returns = ReturnsDF
-)$par
+# Run GA
+ga_result <- ga(type = ga_settings$type, fitness = ga_settings$fitness, 
+                lower = ga_settings$lower, upper = ga_settings$upper, 
+                popSize = ga_settings$popSize, maxiter = ga_settings$maxiter, 
+                run = ga_settings$run)
 
-# Rescale the weights to ensure they sum to 1
-optimalWeights <- optimalWeights / sum(optimalWeights)
+# Best Solution
+best_solution <- ga_result@solution
 
-Folio <- data.frame(Stocks = myStocks, weights = optimalWeights)
+# Ensure that the weights sum up to 1 (due to numerical precision issues)
+best_solution <- best_solution / sum(best_solution)
 
-Folio
+print(best_solution)
