@@ -44,13 +44,15 @@ fitness_function <- function(weights) {
 }
 
 # GA settings
-ga_settings <- list(type = "real-valued", 
-                    fitness = fitness_function, 
-                    lower = rep(0, 10), 
-                    upper = rep(1, 10), 
-                    popSize = 50, 
-                    maxiter = 100, 
-                    run = 50)
+ga_settings <- list(
+  type = "real-valued",
+  fitness = fitness_function,
+  lower = rep(0, 10),
+  upper = rep(1, 10),
+  popSize = 50,
+  maxiter = 100,
+  run = 50
+)
 
 # Run GA
 ga_result <- ga(type = ga_settings$type, fitness = ga_settings$fitness, 
