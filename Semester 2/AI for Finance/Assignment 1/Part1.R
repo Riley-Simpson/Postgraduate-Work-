@@ -1,3 +1,7 @@
+# Install required libraries 
+install.packages("GA")
+install.packages("quantmod")
+
 # Load required libraries
 library(GA)
 library(quantmod)
@@ -51,11 +55,6 @@ optimizePortfolio <- function(StockData, risk_aversion_factor = 0.5, popSize = 5
       run = ga_settings$run
   )
 
-  # Plotting the result
-  png(file="GA_plot.png")
-  plot(ga_result)
-  dev.off()
-
   return(ga_result)
 }
 
@@ -82,6 +81,15 @@ training_best_solution <- training_best_solution / sum(training_best_solution)
 testing_best_solution <- ga_testing_result@solution
 testing_best_solution <- testing_best_solution / sum(testing_best_solution)
 
+
+png(file="C:/Users/riley/Documents/GitHub/Postgraduate-Work-/Semester 2/AI for Finance/Assignment 1/GA_plot_training.png")
+plot(ga_training_result)
+dev.off()
+
+
+png(file="C:/Users/riley/Documents/GitHub/Postgraduate-Work-/Semester 2/AI for Finance/Assignment 1/GA_plot_testing.png")
+plot(ga_testing_result)
+dev.off()
 
 
 print(training_best_solution)
