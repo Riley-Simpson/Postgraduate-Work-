@@ -75,9 +75,9 @@ calculateReturns <- function(StockData, weights) {
 
 # Fetch Stock Data
 myStocks <- c("AAPL", "JPM", "PFE", "AMZN", "XOM", "SO", "GE", "BHP", "PLD", "VZ")
-getSymbols(myStocks, from = "2017-01-01", to = "2022-12-31")
-Training_StockData <- lapply(myStocks, function(stock) get(stock)["2017"])
-Testing_StockData <- lapply(myStocks, function(stock) get(stock)["2022"])
+getSymbols(myStocks, from = "2020-01-01", to = "2022-12-31")
+Training_StockData <- lapply(myStocks, function(stock) get(stock)["2020"])
+Testing_StockData <- lapply(myStocks, function(stock) get(stock)["2021"])
 
 # Run Optimization
 optimized_portfolio <- optimizePortfolio(Training_StockData)
@@ -110,3 +110,4 @@ savePlot(optimized_portfolio, paste0(pathPrefix, "GA_plot_training.png"))
 savePlot(optimizePortfolio(Testing_StockData), paste0(pathPrefix, "GA_plot_testing.png"))
 
 cat("Total Return on Testing Data (2022):", total_return, "\n")
+
