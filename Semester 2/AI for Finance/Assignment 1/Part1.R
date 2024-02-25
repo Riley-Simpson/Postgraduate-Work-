@@ -96,8 +96,8 @@ normalizeSolution <- function(solution) {
 training_best_solution <- normalizeSolution(optimized_portfolio@solution)
 testing_best_solution <- normalizeSolution(optimizePortfolio(Testing_StockData)@solution)
 
-print(training_best_solution)
-print(testing_best_solution)
+#print(training_best_solution)
+#print(testing_best_solution)
 
 # Save Plots
 savePlot <- function(ga_result, filePath) {
