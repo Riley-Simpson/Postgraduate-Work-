@@ -86,7 +86,6 @@ optimized_weights <- optimized_portfolio@solution
 # Evaluate on Testing Data
 testing_returns <- calculateReturns(Testing_StockData, optimized_weights)
 total_return <- sum(testing_returns, na.rm = TRUE)
-cat("Total Return on Testing Data (2022):", total_return, "\n")
 
 # Normalize and Print Solutions
 normalizeSolution <- function(solution) {
@@ -109,3 +108,5 @@ savePlot <- function(ga_result, filePath) {
 pathPrefix <- "C:/Users/riley/Documents/GitHub/Postgraduate-Work-/Semester 2/AI for Finance/Assignment 1/"
 savePlot(optimized_portfolio, paste0(pathPrefix, "GA_plot_training.png"))
 savePlot(optimizePortfolio(Testing_StockData), paste0(pathPrefix, "GA_plot_testing.png"))
+
+cat("Total Return on Testing Data (2022):", total_return, "\n")
