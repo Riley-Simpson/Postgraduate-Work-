@@ -111,3 +111,29 @@ savePlot(optimizePortfolio(Testing_StockData), paste0(pathPrefix, "GA_plot_testi
 
 cat("Total Return on Testing Data (2022):", total_return, "\n")
 
+
+##Comparison of the evolved portfolio with evenly weighted and random portfolios
+
+# Merging the list of xts objects into a single xts object
+merged_testing_data <- do.call(merge, Testing_StockData)
+
+# Calculating returns for each stock
+stock_returns <- ROC(merged_testing_data, type = "discrete", na.pad = FALSE)
+
+# Calculating the returns for the Evenly Weighted and Random Portfolios
+num_stocks <- ncol(stock_returns)
+
+# Evenly Weighted Portfolio
+even_weights <- rep(1/num_stocks, num_stocks)
+even_portfolio_return <- sum(even_weights * colMeans(stock_returns, na.rm = TRUE))
+
+# Random Portfolio
+set.seed(123) # for reproducibility
+random_weights <- runif(num_stocks)
+random_weights <- random_weights / sum(random_weights)
+random_portfolio_return <- sum(random_weights * colMeans(stock_returns, na.rm = TRUE))
+
+# Compare Returns
+print(paste("Evolved Portfolio Return:", total_return)) # the return you obtained earlier
+print(paste("Evenly Weighted Portfolio Return:", even_portfolio_return))
+print(paste("Random Portfolio Return:", random_portfolio_return))
